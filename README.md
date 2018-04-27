@@ -1,2 +1,1 @@
-# DataStructrues
 # DataStructrues BY JS
