@@ -1,3 +1,92 @@
+function HashTable(){
+  var table=[];
+
+  let HashCode=function(key){
+    let hash=0;
+    for(let i=0;i<key.length;i++){
+      hash+=key.charCodeAt(i);
+    }
+    return hash%37;
+  };
+
+  let ValuePair=function(key,value){
+    this.key=key;
+    this.value=value;
+    this.toString=function(){
+      return '['+this.key+' - '+this.value+']';
+    }
+  }
+
+  this.put=function(key,value){
+    let position=HashCode(key);
+    if(table[position]==undefined){
+      table[position]=new LinkedList();
+    }
+    console.log(position+' - '+key);
+    table[position].append(new ValuePair(key,value));
+  };
+
+  this.get=function(key){
+    let position=HashCode(key);
+
+    if(table[position]!==undefined){
+      let current=table[position].getHead();
+      while(current.next){
+        if(current.element.key===key){
+          return current.element.value;
+        }
+        current=current.next;
+      }
+
+      if(current.element.key===key){
+        return current.element.value;
+      }
+    }
+    return undefined;
+  };
+
+  this.remove=function(key){
+    var position=HashCode(key);
+    if(table[position]!==undefined){
+      var current=table[position].getHead();
+      while(current.next){
+        if(current.element.key===key){
+          table[position].remove(current.element);
+          if(table[position].isEmpty()){
+            table[position]=undefined;
+          }
+          return true;
+        }
+        current=current.next;
+      }
+      if(current.element.key===key){
+        table[position].remove(current.element);
+        if(table[position].isEmpty()){
+          table[position]=undefined;
+        }
+        return true;
+      }
+    }
+    return false;
+  };
+}
+
+var hash=new HashTable();
+hash.put("apple","a");
+hash.put("banana","b");
+hash.put("cat","c");
+hash.put("0","d");
+hash.put("1","e");
+hash.put("2","f");
+hash.put("10","g");
+hash.put("11","h");
+hash.put("12","i");
+
+console.log(hash.get("apple"));
+console.log(hash.get("banana"));
+console.log(hash.get("cat"));
+console.log(hash.get("1"));
+
 function LinkedList(){
   let Node=function(element){
     this.element=element;
