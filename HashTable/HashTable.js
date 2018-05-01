@@ -1,3 +1,4 @@
+//以下为分离链接法
 function HashTable(){
   var table=[];
 
@@ -6,7 +7,7 @@ function HashTable(){
     for(let i=0;i<key.length;i++){
       hash+=key.charCodeAt(i);
     }
-    return hash%37;
+    return hash%(2*key.length);
   };
 
   let ValuePair=function(key,value){
@@ -85,8 +86,10 @@ hash.put("12","i");
 console.log(hash.get("apple"));
 console.log(hash.get("banana"));
 console.log(hash.get("cat"));
+console.log(hash.get("2"));
 console.log(hash.get("1"));
 
+//以下为链表的实现
 function LinkedList(){
   let Node=function(element){
     this.element=element;
