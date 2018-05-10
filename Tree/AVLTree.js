@@ -167,9 +167,7 @@ let AVLTree=(function(){
       }else if(element > node.key) {
           node.right = this.Delete(node.right, element);
       }else if(node.left && node.right) {
-          var tmp=this.
-
-          findMinNode(node.right);
+          var tmp=this.findMinNode(node.right);
           node.key=tmp.key;
           node.right=this.Delete(node.right,node.key)
       }else{
