@@ -88,6 +88,22 @@ let AVLTree=(function(){
       this.root=this.insertNode(this.root,element);
     };
 
+    findMinNode(node) {
+        while(node && node.left !== null) {
+            node = node.left;
+        }
+
+        return node;
+    }
+
+    findMaxNode(node) {
+        while(node && node.right !== null) {
+            node = node.right;
+        }
+
+        return node;
+    }
+
     removeNode(node,element){
       if(node===null){
         return null;
@@ -142,6 +158,74 @@ let AVLTree=(function(){
       this.nodeToBeDeleted=null;
       this.root=this.removeNode(this.root,element);
     };
+
+    Delete(node,element){
+      if(node === null) {
+          return null;
+      }else if(element < node.key) {
+          node.left = this.Delete(node.left, element);
+      }else if(element > node.key) {
+          node.right = this.Delete(node.right, element);
+      }else if(node.left && node.right) {
+          var tmp=this.
+
+          findMinNode(node.right);
+          node.key=tmp.key;
+          node.right=this.Delete(node.right,node.key)
+      }else{
+        if(node.left&&node.right===null){
+          var tmp=this.findMaxNode(node.left);
+          node.key=tmp.key;
+          node.left=this.Delete(node.left,node.key);
+        }
+        else if(node.right&&node.left===null){
+          var tmp=this.findMinNode(node.right);
+          node.key=tmp.key;
+          node.right=this.Delete(node.right,node.key);
+        }
+        else{
+          node=null;
+        }
+      }
+      if(node){
+
+          if((this.heightNode(node.left) - this.heightNode(node.right)) === 2) {
+            if(element < node.left.key) {
+                node = this.rotationLR(node);
+            } else {
+                node = this.rotationLL(node);
+            }
+        }
+
+        if((this.heightNode(node.right) - this.heightNode(node.left)) === 2) {
+            if(element > node.right.key) {
+                node = this.rotationRL(node);
+            } else {
+                node = this.rotationRR(node);
+            }
+        }
+
+      }
+
+      return node;
+    };//另一种删除的写法,更直观
+
+    del(element){
+      this.root = this.Delete(this.root, element);
+    };
+
+    inOrderTraverse(callback) {//通过中序遍历方式遍历所有节点
+        this.inOrderTraverseNode(this.root, callback);
+    };
+
+    inOrderTraverseNode(node, callback) {
+        if(node !== null) {
+            this.inOrderTraverseNode(node.left, callback);
+            callback(node);
+            this.inOrderTraverseNode(node.right, callback);
+        }
+    };
+
   }
   return AVLTree;
 })()
