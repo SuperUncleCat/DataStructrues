@@ -1,91 +1,124 @@
-let RedBlackTree=(function(){
-  let Colors={
-    RED:0,
-    BLACK:1
-  };
+let RedBlackTree = (function() {
+    let Colors = {
+        RED: 0,
+        BLACK: 1
+    };
 
-  class Node{
-    constructor(key,color){
-      this.key=key;
-      this.left=null;
-      this.right=null;
-      this.color=color;
+    class Node {
+        constructor(key, color) {
+            this.key = key;
+            this.left = null;
+            this.right = null;
+            this.color = color;
 
-      this.flipColor=function(){
-        if(this.color===Colors.RED){
-          this.color=Colors.BLACK;
-        }else{
-          this.color=Colors.RED;
+            this.flipColor = function() {
+                if(this.color === Colors.RED) {
+                    this.color = Colors.BLACK;
+                } else {
+                    this.color = Colors.RED;
+                }
+            };
         }
-      };
     }
-  }
 
-  class RedBlackTree{
-    constructor(){
-      this.root=null;
-    };
+    class RedBlackTree {
+        constructor() {
+            this.root = null;
+        }
 
-    getRoot(){
-      return this.root;
-    };
+        getRoot() {
+            return this.root;
+        }
 
-    isRed(node){
-      if(!node){
-        return false;
-      }
-      return node.color===Colors.RED;
-    };
+        isRed(node) {
+            if(!node) {
+                return false;
+            }
+            return node.color === Colors.RED;
+        }
 
-    flipColors(node){
-      node.left.flipColor();
-      node.right.flipColor();
-    };
+        flipColors(node) {
+            node.left.flipColor();
+            node.right.flipColor();
+        }
 
-    rotateLeft(node){
-      var temp=node.right;
-      if(temp!==null){
-        node.right=temp.left;
-        temp.left=node;
-        temp.color=node.color;
-        node.color=Colors.RED;
-      }
-      return temp;
-    };
+        rotateLeft(node) {
+            var temp = node.right;
+            if(temp !== null) {
+                node.right = temp.left;
+                temp.left = node;
+                temp.color = node.color;
+                node.color = Colors.RED;
+            }
+            return temp;
+        }
 
-    rotateRight(node){
-      var temp=node.left;
-      if(temp!==null){
-        node.left=temp.right;
-        temp.right=node;
-        temp.color=node.color;
-        node.color=Colors.RED;
-      }
-      return temp;
-    };
+        rotateRight(node) {
+            var temp = node.left;
+            if(temp !== null) {
+                node.left = temp.right;
+                temp.right = node;
+                temp.color = node.color;
+                node.color = Colors.RED;
+            }
+            return temp;
+        }
 
-    insertNode(node,element){
-      if(node===null){
-        return new Node(element,Colors.RED);
-      }
+        insertNode(node, element) {
 
-      var newRoot=node;
+            if(node === null) {
+                return new Node(element, Colors.RED);
+            }
 
-      if(element<node.key){
-        node.left=this.insertNode(node.left,element);
-      }else if(element>node.key){
-        node.right=this.insertNode(node.right,element);
-      }else{
-        node.key=element;
-      }
+            var newRoot = node;
 
-      if(!this.isRed(node.left)&&this.isRed(node.right)){
-        newRoot=this.rotateLeft(node);
-      }
+            if(element < node.key) {
 
-      if(this.isRed(node.left)&&this.isRed(node.left.left)){
-        newRoot=this.rotateRight(node);
-      }
+                node.left = this.insertNode(node.left, element);
+
+            } else if(element > node.key) {
+
+                node.right =this.insertNode(node.right, element);
+
+            } else {
+                node.key = element;//覆盖相同的值
+            }
+
+            if(this.isRed(node.right) && !this.isRed(node.left)) {
+                newRoot = this.rotateLeft(node);
+            }
+
+            if(this.isRed(node.left) && this.isRed(node.left.left)) {
+                newRoot = this.rotateRight(node);
+            }
+            if(this.isRed(node.left) && this.isRed(node.right)) {
+                this.flipColors(node);
+            }
+
+            return newRoot;
+        }
+
+        insert(element) {
+            this.root = this.insertNode(this.root, element);
+            this.root.color = Colors.BLACK;
+        }
     }
-  }
-})
+    return RedBlackTree;
+})()
+
+var rbTree = new RedBlackTree();
+
+rbTree.insert(1);
+rbTree.insert(2);
+rbTree.insert(3);
+rbTree.insert(4);
+rbTree.insert(5);
+rbTree.insert(6);
+rbTree.insert(7);
+rbTree.insert(14);
+rbTree.insert(15);
+rbTree.insert(13);
+rbTree.insert(12);
+rbTree.insert(11);
+
+console.log(rbTree.getRoot());

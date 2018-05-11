@@ -64,7 +64,7 @@ let AVLTree=(function(){
               node=this.rotationLL(node);
             }else{
               node=this.rotationLR(node);
-            }
+            }//判断在左子树的左边还是右边
           }
         }
       }else if(element>node.key){
