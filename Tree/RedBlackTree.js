@@ -1,7 +1,7 @@
 let RedBlackTree = (function() {
     let Colors = {
-        RED: 0,
-        BLACK: 1
+        RED: false,
+        BLACK: true
     };
 
     class Node {
@@ -55,7 +55,7 @@ let RedBlackTree = (function() {
                 node.color = Colors.RED;
             }
             return temp;
-        }//右旋
+        }//左旋 对具有任意右孩子节点进行 旋转以后x的右孩子y取代了x,而x成为y的左孩子,y的左孩子成为x的右孩子
 
         rotateRight(node) {
             var temp = node.left;
@@ -66,7 +66,7 @@ let RedBlackTree = (function() {
                 node.color = Colors.RED;
             }
             return temp;
-        }//左旋
+        }//右旋 对具有任意左孩子节点进行 旋转以后结点x被左孩子y替换,x成为y的右儿子,y的右孩子成为x的左孩子 这是一个中间操作 后面会通过右旋而颜色转换修复
 
         min() {//返回二叉树中最小的键值
             return this.minNode(this.root);
@@ -78,7 +78,7 @@ let RedBlackTree = (function() {
                     node = node.left;
                 }
 
-                return node.key;
+                return node;
             }
             return null;
         }
@@ -93,10 +93,11 @@ let RedBlackTree = (function() {
                     node = node.right;
                 }
 
-                return node.key;
+                return node;
             }
             return null;
         }
+
 
         searchNode(node,key){
           if(node===null){
@@ -156,29 +157,10 @@ let RedBlackTree = (function() {
           this.root.color = Colors.BLACK;
       }
 
-      fixUp(node){
-
-        var newNode = node;
-
-        if(!this.isRed(node.left) && this.isRed(node.right)){
-          newNode=this.rotateLeft(node);
-        }
-
-        if(this.isRed(node.left)&&this.isRed(node.left.left)){
-          newNode=this.rotateRight(node);
-        }
-
-        if(this.isRed(node.left)&&this.isRed(node.right)){
-          newNode=this.flipColors(node);
-        }
-
-        return newNode;
-      }//修复红色右节点
-
       moveRedRight(node){
         this.flipColors(node);
         if(this.isRed(node.left.left)){
-          node=this.rotateLeft(node);
+          node=this.rotateRight(node);
           this.flipColors(node);
         }
         return node;
@@ -187,19 +169,18 @@ let RedBlackTree = (function() {
       moveRedLeft(node){
         this.flipColors(node);
         if(this.isRed(node.right.left)){
-          node.right=this.rotateRight(node.right);
-          node=this.rotateLeft(node);
+          node.right=this.rotateRight(node.right);//旋转以后结点x被左孩子y替换,x成为y的右儿子,y的右孩子成为x的左孩子 这是一个中间操作 后面会通过左旋而颜色转换修复
+          node=this.rotateLeft(node);//旋转以后x的右孩子y取代了x,而x成为y的左孩子,y的左孩子成为x的右孩子
           this.flipColors(node);
-        }//判断兄弟节点的左孩子是否为红,若是则当前节点德父节点进行左右旋转且颜色转换
+        }//判断兄弟节点的左孩子是否为红,若是则当前节点的父节点进行左右旋转且颜色转换
         return node;
       }
 
       removeMin(node){
+
         if(node.left===null){
           return null;
         }
-
-        var newNode = node;
 
         if (!this.isRed(node.left) && !this.isRed(node.left.left)){
           node=this.moveRedLeft(node);
@@ -208,25 +189,24 @@ let RedBlackTree = (function() {
         node.left=this.removeMin(node.left);
 
         if(this.isRed(node.right) && !this.isRed(node.left)) {
-            newNode = this.rotateLeft(node);
+            node = this.rotateLeft(node);
         }
 
         if(this.isRed(node.left) && this.isRed(node.left.left)) {
-            newNode = this.rotateRight(node);
+            node = this.rotateRight(node);
         }
         if(this.isRed(node.left) && this.isRed(node.right)) {
             this.flipColors(node);
         }
 
-        return newNode;
+        return node;
       }
 
       removeMax(node){
 
-        var newNode=node;
-
+        //使树出现红色右链接
         if(this.isRed(node.left))
-          node=this.rotateLeft(node);
+          node=this.rotateRight(node);
 
         if(node.right===null){
           return null;
@@ -243,38 +223,119 @@ let RedBlackTree = (function() {
         }
 
         if(this.isRed(node.right) && !this.isRed(node.left)) {
-            newNode = this.rotateLeft(node);
+            node = this.rotateLeft(node);
         }
 
         if(this.isRed(node.left) && this.isRed(node.left.left)) {
-            newNode = this.rotateRight(node);
+            node = this.rotateRight(node);
         }
         if(this.isRed(node.left) && this.isRed(node.right)) {
             this.flipColors(node);
         }
 
-        return newNode;
-      }
-
-      delMin(){
-        return this.removeMin(this.root);
-      }
-
-      delMax(){
-        return this.removeMax(this.root);
+        return node;
       }
 
       removeNode(node,element){
+
         if(element<node.key){
-          if(!this.isRed(node.left)&&!this.isRed(node.right)){
+          if(!this.isRed(node.left)&&!this.isRed(node.left.left)){
             node=this.moveRedLeft(node);
           }
           node.left=this.removeNode(node.left,element);
+        }else{
+          //确保在右子树中能出现红色右孩子
+          if(this.isRed(node.left)){
+            node=this.rotateRight(node);
+          }
+
+          //待删除的节点在树底
+          if(element===node.key&&node.right===null){
+            return null;
+          }
+          //待删除的节点不在树底
+          if(element===node.key){
+            var temp=this.minNode(node.right);
+            node.key=temp.key;
+            node.right=this.removeMin(node.right);
+          }else{
+
+            if(!this.isRed(node.right)&&!this.isRed(node.right.left)){
+              node=this.moveRedRight(node);
+            }
+            node.right=this.removeNode(node.right,element);
+          }
         }
+
+        if(this.isRed(node.right) && !this.isRed(node.left)) {
+            node = this.rotateLeft(node);
+        }
+
+        if(this.isRed(node.left) && this.isRed(node.left.left)) {
+            node = this.rotateRight(node);
+        }
+        if(this.isRed(node.left) && this.isRed(node.right)) {
+            this.flipColors(node);
+        }
+
+        return node;
       }
 
       remove(element){
-        this.root=removeNode(this.root,element);
+        if(element===null){
+          return null;
+        }
+
+        if(!this.isRed(this.root.left)&&!this.isRed(this.root.right)){
+          this.root.color=Colors.RED;
+        }
+        this.root=this.removeNode(this.root,element);
+        this.root.color=Colors.BLACK;
+      }
+
+      deleteNode(node,element){
+        if(node === null) {
+            return null;
+        }else if(element < node.key) {
+          if(!this.isRed(node.left)&&!this.isRed(node.right)){
+            node=moveRedLeft(node);
+          }
+          node.left = this.deleteNode(node.left, element);
+        }else if(element > node.key) {
+          if(!this.isRed(node.right)&&!this.isRed(node.right.left)){
+            node=this.moveRedRight(node);
+          }
+          node.right = this.deleteNode(node.right, element);
+        }else if(node.left && node.right) {
+            var tmp=this.minNode(node.right);
+            node.key=tmp.key;
+            node.right=this.removeMin(node.right)
+        }else{
+          if(node.left&&node.right===null){
+            var tmp=this.maxNode(node.left);
+            node.key=tmp.key;
+            node.left=this.removeMax(node.left);
+          }
+          else if(node.right&&node.left===null){
+            var tmp=this.minNode(node.right);
+            node.key=tmp.key;
+            node.right=this.removeMin(node.right);
+          }
+          else{
+            node=null;
+          }
+        }
+      }
+
+      delete(element){
+        if(element===null){
+          return null;
+        }
+
+        if(!this.isRed(this.root.left)&&!this.isRed(this.root.right)){
+          this.root.color=Colors.RED;
+        }
+        this.root=this.removeNode(this.root,element);
         this.root.color=Colors.BLACK;
       }
 
@@ -297,5 +358,15 @@ rbTree.insert(13);
 rbTree.insert(12);
 rbTree.insert(11);
 
-rbTree.delMax();
-console.log(rbTree.max());
+// rbTree.remove(1);
+// rbTree.remove(2);
+// rbTree.remove(15);
+// rbTree.remove(14);
+
+rbTree.delete(1);
+rbTree.delete(2);
+rbTree.delete(15);
+rbTree.delete(14);
+// console.log(rbTree.max());
+// console.log(rbTree.min());
+console.log(rbTree.getRoot());
