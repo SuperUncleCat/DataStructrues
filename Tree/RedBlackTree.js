@@ -233,6 +233,10 @@ let RedBlackTree = (function() {
 
         node.right=this.removeMax(node.right);
 
+        if (!this.isRed(node.left) && !this.isRed(node.left.left)){
+          node=this.moveRedLeft(node);
+        }
+
         return this.fixUp(node);
       }
 
