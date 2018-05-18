@@ -157,6 +157,21 @@ let RedBlackTree = (function() {
           this.root.color = Colors.BLACK;
       }
 
+      fixUp(node){
+        if(this.isRed(node.right) && !this.isRed(node.left)) {
+            node = this.rotateLeft(node);
+        }
+
+        if(this.isRed(node.left) && this.isRed(node.left.left)) {
+            node = this.rotateRight(node);
+        }
+        if(this.isRed(node.left) && this.isRed(node.right)) {
+            this.flipColors(node);
+        }
+
+        return node;
+      }
+
       moveRedRight(node){
         this.flipColors(node);
         if(this.isRed(node.left.left)){
@@ -218,22 +233,7 @@ let RedBlackTree = (function() {
 
         node.right=this.removeMax(node.right);
 
-        if (!this.isRed(node.left) && !this.isRed(node.left.left)){
-          node=this.moveRedLeft(node);
-        }
-
-        if(this.isRed(node.right) && !this.isRed(node.left)) {
-            node = this.rotateLeft(node);
-        }
-
-        if(this.isRed(node.left) && this.isRed(node.left.left)) {
-            node = this.rotateRight(node);
-        }
-        if(this.isRed(node.left) && this.isRed(node.right)) {
-            this.flipColors(node);
-        }
-
-        return node;
+        return this.fixUp(node);
       }
 
       removeNode(node,element){
@@ -267,18 +267,7 @@ let RedBlackTree = (function() {
           }
         }
 
-        if(this.isRed(node.right) && !this.isRed(node.left)) {
-            node = this.rotateLeft(node);
-        }
-
-        if(this.isRed(node.left) && this.isRed(node.left.left)) {
-            node = this.rotateRight(node);
-        }
-        if(this.isRed(node.left) && this.isRed(node.right)) {
-            this.flipColors(node);
-        }
-
-        return node;
+        return this.fixUp(node);
       }
 
       remove(element){
@@ -325,6 +314,8 @@ let RedBlackTree = (function() {
             node=null;
           }
         }
+
+        return this.fixUp(node);
       }
 
       delete(element){
